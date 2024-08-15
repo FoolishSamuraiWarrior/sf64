@@ -69,6 +69,81 @@ s32 Play_GetMaxShields(void) {
     return 255;
 }
 
+#if ENABLE_60FPS == 1 // Play_UpdateDynaFloor *solar
+void Play_UpdateDynaFloor(void) { // Lava floor
+    Vec3f spC4;
+    Vec3f spB8;
+    Vtx* spB4;
+    u16* spB0;
+    s32 i;
+    s32 spA8;
+    f32* var_s3;
+    f32* var_s5;
+    f32* var_s4;
+    f32* var_s0;
+    f32* var_s1;
+    f32 sp90;
+    f32 sp8C;
+    f32 sp88;
+    f32 sp84;
+    gDynaFloorTimer++;
+    switch (gCurrentLevel) {
+        case LEVEL_SOLAR:
+            if ((gGameFrameCount % (2 MUL_FRAME_FACTOR)) != 0) { // 60fps??????
+                spB4 = SEGMENTED_TO_VIRTUAL(D_SO_6001C50);
+            } else {
+                spB4 = SEGMENTED_TO_VIRTUAL(D_SO_6004500);
+            }
+            spB0 = SEGMENTED_TO_VIRTUAL(D_SO_6022760);
+            spA8 = 16 - 1;
+            sp90 = 70.0f;
+            sp8C = 0.1f;
+            sp88 = 2.2f;
+            sp84 = 0.5f;
+            break;
+        case LEVEL_ZONESS:
+            if ((gGameFrameCount % (2 MUL_FRAME_FACTOR)) != 0) { // 60fps??????
+                spB4 = SEGMENTED_TO_VIRTUAL(D_ZO_6009ED0);
+            } else {
+                spB4 = SEGMENTED_TO_VIRTUAL(D_ZO_600C780);
+            }
+            spB0 = SEGMENTED_TO_VIRTUAL(D_ZO_602AC50);
+            spA8 = 8 - 1;
+            sp90 = 40.0f;
+            sp8C = 0.2f;
+            sp88 = 1.0f;
+            sp84 = 2.0f;
+            break;
+    }
+    var_s3 = D_ctx_801782CC;
+    var_s5 = D_ctx_801782D4;
+    var_s4 = D_ctx_801782DC;
+    var_s0 = D_ctx_801782E4;
+    var_s1 = D_ctx_801782EC;
+    for (i = 0; i < 17 * 17; i++, var_s3++, var_s5++, var_s4++, var_s0++, var_s1++, spB0++) {
+        Math_SmoothStepToF(var_s3, *var_s5, sp8C DIV_FRAME_FACTOR, *var_s4 DIV_FRAME_FACTOR, 0.0f);
+        Math_SmoothStepToF(var_s4, 100.0f, 1.0f DIV_FRAME_FACTOR, sp84 DIV_FRAME_FACTOR, 0.0f);
+        if ((gDynaFloorTimer & spA8) == (i & spA8)) {
+            *var_s5 = RAND_FLOAT(sp90);
+            *var_s4 = 0.0f;
+        }
+        *var_s0 += *var_s1 DIV_FRAME_FACTOR;
+        *var_s1 -= 0.5f DIV_FRAME_FACTOR;
+        if (*var_s0 < 0.0f) {
+            *var_s1 = *var_s0 = 0.0f;
+        }
+        spB4[*spB0].n.ob[1] = (s16) *var_s3 + (s16) *var_s0;
+        Matrix_RotateZ(gCalcMatrix, *var_s3 * sp88 * M_DTOR, MTXF_NEW);
+        spC4.x = 120.0f;
+        spC4.y = 0.0f;
+        spC4.z = 0.0f;
+        Matrix_MultVec3fNoTranslate(gCalcMatrix, &spC4, &spB8);
+        spB4[*spB0].n.n[0] = spB8.x;
+        spB4[*spB0].n.n[1] = spB8.y;
+        spB4[*spB0].n.n[2] = spB8.z;
+    }
+}
+#else
 void Play_UpdateDynaFloor(void) { // Lava floor
     Vec3f spC4;
     Vec3f spB8;
@@ -142,7 +217,10 @@ void Play_UpdateDynaFloor(void) { // Lava floor
         spB4[*spB0].n.n[2] = spB8.z;
     }
 }
+#endif
+
 // clang-format off
+
 #if ENABLE_60FPS == 1 // Player_WingEffects
 void Player_WingEffects(Player* player) {
     if ((gCurrentLevel == LEVEL_VENOM_ANDROSS) && (gBosses[0].obj.status == OBJ_ACTIVE) && (gBosses[0].state == 17)) {
@@ -192,6 +270,66 @@ void Player_WingEffects(Player* player) {
 }
 #endif
 
+#if ENABLE_60FPS == 1 // Player_DamageEffects
+void Player_DamageEffects(Player* player) { // 60fps Damage effects *no changes yet
+    s32 var_v1;
+    f32 sp40;
+
+    if (!player->alternateView || (gLevelMode == LEVELMODE_ALL_RANGE)) {
+        if (player->wings.rightState <= WINGSTATE_BROKEN) {
+            if (((gGameFrameCount % (2U MUL_FRAME_FACTOR)) == 0) && (gRightWingDebrisTimer[player->num] != 0)) {
+                func_effect_8007D10C(RAND_FLOAT_CENTERED(10.0f) + player->hit1.x, RAND_FLOAT(5.0f) + player->hit1.y, player->hit1.z, 1.0f);
+            }
+            if (((gGameFrameCount % (2U MUL_FRAME_FACTOR)) == 0) && (Rand_ZeroOne() < 0.5f) && !gVersusMode) {
+                func_effect_8007C484(RAND_FLOAT_CENTERED(5.0f) + player->hit1.x, RAND_FLOAT(5.0f) + player->hit1.y, player->hit1.z, player->vel.x, player->vel.y, player->vel.z, RAND_FLOAT(0.02f) + 0.02f, player->num + 1);
+            }
+        }
+        if (player->wings.leftState <= WINGSTATE_BROKEN) {
+            if (((gGameFrameCount % (2U MUL_FRAME_FACTOR)) == 0) && (gLeftWingDebrisTimer[player->num] != 0)) {
+                func_effect_8007D10C(RAND_FLOAT_CENTERED(10.0f) + player->hit2.x, RAND_FLOAT(5.0f) + player->hit2.y, player->hit2.z, 1.0f);
+            }
+            if (((gGameFrameCount % (2U MUL_FRAME_FACTOR)) == 0) && (Rand_ZeroOne() < 0.5f) && !gVersusMode) {
+                func_effect_8007C484(RAND_FLOAT_CENTERED(5.0f) + player->hit2.x, RAND_FLOAT(5.0f) + player->hit2.y, player->hit2.z, player->vel.x, player->vel.y, player->vel.z, RAND_FLOAT(0.02f) + 0.02f, player->num + 1);
+            }
+        }
+    }
+    var_v1 = 7;
+    if (player->shields < 64) {
+        if (player->shields > 16) {
+            var_v1 = 16 - 1;
+        }
+        if (player->shields > 32) {
+            var_v1 = 32 - 1;
+        }
+        if (player->shields > 48) {
+            var_v1 = 64 - 1;
+        }
+        if (!player->alternateView || (gLevelMode == LEVELMODE_ALL_RANGE)) {
+            sp40 = 0.0f;
+            if (player->form == FORM_LANDMASTER) {
+                sp40 = 30.0f;
+            }
+            if (((gGameFrameCount DIV_FRAME_FACTOR) & var_v1) == 0) {
+                func_effect_8007D10C(player->pos.x + RAND_FLOAT_CENTERED(10.0f),
+                                     player->pos.y + sp40 + RAND_FLOAT(10.0f),
+                                     player->trueZpos + RAND_FLOAT_CENTERED(10.0f), 2.2f);
+            }
+            if ((((gGameFrameCount DIV_FRAME_FACTOR) & (var_v1 >> 2)) == 0) && (Rand_ZeroOne() < 0.5f)) {
+                func_effect_8007C484(player->pos.x + RAND_FLOAT_CENTERED(30.0f),
+                                     player->pos.y + sp40 + RAND_FLOAT(10.0f),
+                                     player->trueZpos + RAND_FLOAT_CENTERED(30.0f), player->vel.x, player->vel.y,
+                                     player->vel.z, 0.04f + RAND_FLOAT(0.03f), player->num + 1);
+                if (player->dmgEffectTimer == 0) {
+                    player->dmgEffectTimer = 2;
+                }
+            }
+        } else if ((((gGameFrameCount DIV_FRAME_FACTOR) & (var_v1 >> 2)) == 0) && (Rand_ZeroOne() < 0.5f) &&
+                   (player->dmgEffectTimer == 0)) {
+            player->dmgEffectTimer = 2 MUL_FRAME_FACTOR;
+        }
+    }
+}
+#else
 void Player_DamageEffects(Player* player) { // 60fps Damage effects *no changes yet
     s32 var_v1;
     f32 sp40;
@@ -250,6 +388,7 @@ void Player_DamageEffects(Player* player) { // 60fps Damage effects *no changes 
         }
     }
 }
+#endif
 
 #if ENABLE_60FPS == 1 // Player_WaterEffects *Wake only
 void Player_WaterEffects(Player* player) {
@@ -584,160 +723,163 @@ void Play_InitEnvironment(void) {
 #endif
 
 #if MOD_FOG_FIX == 1
-if (gCurrentLevel == LEVEL_SECTOR_Y){
-    gProjectNear = 10.0f / 1.25;
-    gProjectFar = 12800.0f * 1.25;
-}else{
-    gProjectNear = 10.0f;
-    gProjectFar = 12800.0f / 1.25; // theboy181 Adjust the Draw Distance impacts FOG
-}
+    if (gCurrentLevel == LEVEL_SECTOR_Y) {
+        gProjectNear = 10.0f / 1.25;
+        gProjectFar = 12800.0f * 1.25;
+        }else if(gCurrentLevel == LEVEL_KATINA) {
+            gProjectNear = 10.0f / 1.50;
+            gProjectFar = 12800.0f * 1.50;
+        } else {
+            gProjectNear = 10.0f;
+            gProjectFar = 12800.0f / 1.25; // theboy181 Adjust the Draw Distance impacts FOG
+        }
 #endif
 
-    gLight2colorStep = 40;
-    D_ctx_80178544 = 40;
-    gFovY = 45.0f;
-}
+        gLight2colorStep = 40;
+        D_ctx_80178544 = 40;
+        gFovY = 45.0f;
+    }
 
-void Play_GenerateStarfield(void) {
-    u32 i;
+    void Play_GenerateStarfield(void) {
+        u32 i;
 
-    MEM_ARRAY_ALLOCATE(gStarOffsetsX, 1000);
-    MEM_ARRAY_ALLOCATE(gStarOffsetsY, 1000);
-    MEM_ARRAY_ALLOCATE(gStarFillColors, 1000);
-    Rand_SetSeed(1, 29000, 9876);
-    for (i = 0; i < 1000; i++) {
-        gStarOffsetsX[i] = RAND_FLOAT_SEEDED(480.0f) - 80.0f;
-        gStarOffsetsY[i] = RAND_FLOAT_SEEDED(360.0f) - 60.0f;
-        gStarFillColors[i] = FILL_COLOR(gStarColors[i % ARRAY_COUNT(gStarColors)]);
-    }
-}
-
-void Play_SetupStarfield(void) {
-    Play_GenerateStarfield();
-    gGroundHeight = -25000.0f;
-    gStarCount = 600;
-    if (gCurrentLevel == LEVEL_AREA_6) {
-        gStarCount = 300;
-    }
-    if (gCurrentLevel == LEVEL_UNK_15) {
-        gStarCount = 400;
-    }
-    if (gGameState != GSTATE_PLAY) {
-        gStarCount = 800;
-    }
-    if (gCurrentLevel == LEVEL_FORTUNA) {
-        gStarCount = 500;
-    }
-    if (gVersusMode) {
-        gStarCount = 0;
-    }
-    if (gCurrentLevel == LEVEL_BOLSE) {
-        gStarCount = 300;
-        gGroundHeight = -0.0f;
-    }
-    if (gCurrentLevel == LEVEL_TRAINING) {
-        gStarCount = 800;
-        gGroundHeight = -0.0f;
-    }
-}
-
-void Player_PlaySfx(f32* sfxSrc, u32 sfxId, s32 mode) {
-    if (!gVersusMode) {
-        AUDIO_PLAY_SFX(sfxId, sfxSrc, 0);
-    } else {
-        AUDIO_PLAY_SFX(sfxId, sfxSrc, mode);
-    }
-}
-
-void Play_PlaySfxFirstPlayer(f32* sfxSrc, u32 sfxId) {
-    AUDIO_PLAY_SFX(sfxId, sfxSrc, 0);
-}
-
-void Play_PlaySfxNoPlayer(f32* sfxSrc, u32 sfxId) {
-    AUDIO_PLAY_SFX(sfxId, sfxSrc, 4);
-}
-
-void BonusText_Initialize(BonusText* bonus) {
-    s32 i;
-    u8* ptr = (u8*) bonus;
-
-    for (i = 0; i < sizeof(BonusText); i++, ptr++) {
-        *ptr = 0;
-    }
-}
-
-void TexturedLine_Initialize(TexturedLine* texLine) {
-    s32 i;
-    u8* ptr = (u8*) texLine;
-
-    for (i = 0; i < sizeof(TexturedLine); i++, ptr++) {
-        *ptr = 0;
-    }
-}
-
-void RadarMark_Initialize(RadarMark* radarMark) {
-    s32 i;
-    u8* ptr = (u8*) radarMark;
-
-    for (i = 0; i < sizeof(RadarMark); i++, ptr++) {
-        *ptr = 0;
-    }
-}
-
-void Play_ClearObjectData(void) {
-    s16 i;
-    s16 j;
-
-    for (i = 0; i < ARRAY_COUNT(gBonusText); i++) {
-        BonusText_Initialize(&gBonusText[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gRadarMarks); i++) {
-        RadarMark_Initialize(&gRadarMarks[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gTexturedLines); i++) {
-        TexturedLine_Initialize(&gTexturedLines[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gScenery); i++) {
-        Object_Kill(&gScenery[i].obj, gScenery[i].sfxSource);
-        Scenery_Initialize(&gScenery[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gSprites); i++) {
-        Sprite_Initialize(&gSprites[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gActors); i++) {
-        Object_Kill(&gActors[i].obj, gActors[i].sfxSource);
-        Actor_Initialize(&gActors[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gBosses); i++) {
-        Object_Kill(&gBosses[i].obj, gBosses[i].sfxSource);
-        Boss_Initialize(&gBosses[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gEffects); i++) {
-        Object_Kill(&gEffects[i].obj, gEffects[i].sfxSource);
-        Effect_Initialize(&gEffects[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gItems); i++) {
-        Object_Kill(&gItems[i].obj, gItems[i].sfxSource);
-        Item_Initialize(&gItems[i]);
-    }
-    for (i = 0; i < ARRAY_COUNT(gPlayerShots); i++) {
-        Object_Kill(&gPlayerShots[i].obj, gPlayerShots[i].sfxSource);
-        PlayerShot_Initialize(&gPlayerShots[i]);
-    }
-    gDrawSmallRocks = D_ctx_801782BC = D_ctx_801782C0 = D_ctx_801782D0 = gBossActive = gKillEventActors =
-        gGroundClipMode = gPrevEventActorIndex = gFormationLeaderIndex = gRingPassCount = 0;
-    gFormationInitPos.x = gFormationInitPos.y = gFormationInitPos.z = gFormationInitRot.x = gFormationInitRot.y =
-        gFormationInitRot.z = 0.0f;
-    for (i = 0; i < ARRAY_COUNT(gTeamArrowsViewPos); i++) {
-        gTeamArrowsViewPos[i].x = gTeamArrowsViewPos[i].y = gTeamArrowsViewPos[i].z = 100.0f;
-    }
-    for (i = 0; i < ARRAY_COUNT(gActor194yPos); i++) {
-        gActor194Status[i] = 0;
-        for (j = 0; j < ARRAY_COUNT(*gActor194yPos); j++) {
-            gActor194yPos[i][j] = -5000.0f;
+        MEM_ARRAY_ALLOCATE(gStarOffsetsX, 1000);
+        MEM_ARRAY_ALLOCATE(gStarOffsetsY, 1000);
+        MEM_ARRAY_ALLOCATE(gStarFillColors, 1000);
+        Rand_SetSeed(1, 29000, 9876);
+        for (i = 0; i < 1000; i++) {
+            gStarOffsetsX[i] = RAND_FLOAT_SEEDED(480.0f) - 80.0f;
+            gStarOffsetsY[i] = RAND_FLOAT_SEEDED(360.0f) - 60.0f;
+            gStarFillColors[i] = FILL_COLOR(gStarColors[i % ARRAY_COUNT(gStarColors)]);
         }
     }
-}
+
+    void Play_SetupStarfield(void) {
+        Play_GenerateStarfield();
+        gGroundHeight = -25000.0f;
+        gStarCount = 600;
+        if (gCurrentLevel == LEVEL_AREA_6) {
+            gStarCount = 300;
+        }
+        if (gCurrentLevel == LEVEL_UNK_15) {
+            gStarCount = 400;
+        }
+        if (gGameState != GSTATE_PLAY) {
+            gStarCount = 800;
+        }
+        if (gCurrentLevel == LEVEL_FORTUNA) {
+            gStarCount = 500;
+        }
+        if (gVersusMode) {
+            gStarCount = 0;
+        }
+        if (gCurrentLevel == LEVEL_BOLSE) {
+            gStarCount = 300;
+            gGroundHeight = -0.0f;
+        }
+        if (gCurrentLevel == LEVEL_TRAINING) {
+            gStarCount = 800;
+            gGroundHeight = -0.0f;
+        }
+    }
+
+    void Player_PlaySfx(f32 * sfxSrc, u32 sfxId, s32 mode) {
+        if (!gVersusMode) {
+            AUDIO_PLAY_SFX(sfxId, sfxSrc, 0);
+        } else {
+            AUDIO_PLAY_SFX(sfxId, sfxSrc, mode);
+        }
+    }
+
+    void Play_PlaySfxFirstPlayer(f32 * sfxSrc, u32 sfxId) {
+        AUDIO_PLAY_SFX(sfxId, sfxSrc, 0);
+    }
+
+    void Play_PlaySfxNoPlayer(f32 * sfxSrc, u32 sfxId) {
+        AUDIO_PLAY_SFX(sfxId, sfxSrc, 4);
+    }
+
+    void BonusText_Initialize(BonusText * bonus) {
+        s32 i;
+        u8* ptr = (u8*) bonus;
+
+        for (i = 0; i < sizeof(BonusText); i++, ptr++) {
+            *ptr = 0;
+        }
+    }
+
+    void TexturedLine_Initialize(TexturedLine * texLine) {
+        s32 i;
+        u8* ptr = (u8*) texLine;
+
+        for (i = 0; i < sizeof(TexturedLine); i++, ptr++) {
+            *ptr = 0;
+        }
+    }
+
+    void RadarMark_Initialize(RadarMark * radarMark) {
+        s32 i;
+        u8* ptr = (u8*) radarMark;
+
+        for (i = 0; i < sizeof(RadarMark); i++, ptr++) {
+            *ptr = 0;
+        }
+    }
+
+    void Play_ClearObjectData(void) {
+        s16 i;
+        s16 j;
+
+        for (i = 0; i < ARRAY_COUNT(gBonusText); i++) {
+            BonusText_Initialize(&gBonusText[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gRadarMarks); i++) {
+            RadarMark_Initialize(&gRadarMarks[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gTexturedLines); i++) {
+            TexturedLine_Initialize(&gTexturedLines[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gScenery); i++) {
+            Object_Kill(&gScenery[i].obj, gScenery[i].sfxSource);
+            Scenery_Initialize(&gScenery[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gSprites); i++) {
+            Sprite_Initialize(&gSprites[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gActors); i++) {
+            Object_Kill(&gActors[i].obj, gActors[i].sfxSource);
+            Actor_Initialize(&gActors[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gBosses); i++) {
+            Object_Kill(&gBosses[i].obj, gBosses[i].sfxSource);
+            Boss_Initialize(&gBosses[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gEffects); i++) {
+            Object_Kill(&gEffects[i].obj, gEffects[i].sfxSource);
+            Effect_Initialize(&gEffects[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gItems); i++) {
+            Object_Kill(&gItems[i].obj, gItems[i].sfxSource);
+            Item_Initialize(&gItems[i]);
+        }
+        for (i = 0; i < ARRAY_COUNT(gPlayerShots); i++) {
+            Object_Kill(&gPlayerShots[i].obj, gPlayerShots[i].sfxSource);
+            PlayerShot_Initialize(&gPlayerShots[i]);
+        }
+        gDrawSmallRocks = D_ctx_801782BC = D_ctx_801782C0 = D_ctx_801782D0 = gBossActive = gKillEventActors =
+            gGroundClipMode = gPrevEventActorIndex = gFormationLeaderIndex = gRingPassCount = 0;
+        gFormationInitPos.x = gFormationInitPos.y = gFormationInitPos.z = gFormationInitRot.x = gFormationInitRot.y =
+            gFormationInitRot.z = 0.0f;
+        for (i = 0; i < ARRAY_COUNT(gTeamArrowsViewPos); i++) {
+            gTeamArrowsViewPos[i].x = gTeamArrowsViewPos[i].y = gTeamArrowsViewPos[i].z = 100.0f;
+        }
+        for (i = 0; i < ARRAY_COUNT(gActor194yPos); i++) {
+            gActor194Status[i] = 0;
+            for (j = 0; j < ARRAY_COUNT(*gActor194yPos); j++) {
+                gActor194yPos[i][j] = -5000.0f;
+            }
+        }
+    }
 
 #if ENABLE_60FPS == 1 // Play_UpdateFillScreen
 void Play_UpdateFillScreen(void) {
@@ -1055,7 +1197,7 @@ void Player_GroundedCollision(Player* player, u32 arg1, f32 arg2, f32 arg3) { //
             player->knockback.x = 0.0f;
             player->pos.x += D_800D2FEC[player->hitDirection] DIV_FRAME_FACTOR;
             if (player->form == FORM_LANDMASTER) {
-                player->pos.x -= D_800D2FEC[player->hitDirection];
+                player->pos.x -= D_800D2FEC[player->hitDirection] DIV_FRAME_FACTOR; // changed 8/14/2024
             }
             Math_SmoothStepToF(&player->baseSpeed, 2.0f, (1.0f DIV_FRAME_FACTOR), (2.0f DIV_FRAME_FACTOR), (0.00001f DIV_FRAME_FACTOR)); // 60fps
             break;
@@ -3562,11 +3704,11 @@ void Player_ArwingBank(Player* player) { // 60fps Arwing Roll
 
     sp3C = 0.0f;
     if ((player->wings.rightState <= WINGSTATE_BROKEN) && (player->wings.leftState == WINGSTATE_INTACT)) {
-        sp3C = -17.0f DIV_FRAME_FACTOR; // 60fps ??????
+        sp3C = -17.0f;
     } else if ((player->wings.leftState <= WINGSTATE_BROKEN) && (player->wings.rightState == WINGSTATE_INTACT)) {
-        sp3C = 17.0f DIV_FRAME_FACTOR; // 60fps ??????
+        sp3C = 17.0f;
     }
-    sp38 = (0.1f);
+    sp38 = 0.1f;
     if ((gInputHold->button & Z_TRIG) && !(gInputHold->button & R_TRIG)) {
         sp3C = 90.0f;
         sp38 = 0.2f;
@@ -3826,10 +3968,66 @@ void Player_UpdatePath(Player* player) {
 }
 #endif
 
+#if ENABLE_60FPS == 1 // Player_CheckBounds360
 void Player_CheckBounds360(Player* player) {
     f32 var_fv1;
     bool var_v0 = false;
 
+    if (gCamCount != 1) {
+        if (player->pos.x > 12000.0f) {
+            var_v0 = true;
+            player->pos.x -= 24000.0f DIV_FRAME_FACTOR;
+            player->cam.eye.x -= 24000.0f DIV_FRAME_FACTOR;
+            player->cam.at.x -= 24000.0f DIV_FRAME_FACTOR;
+        }
+        if (player->pos.x < -12000.0f) {
+            var_v0 = true;
+            player->pos.x += 24000.0f DIV_FRAME_FACTOR;
+            player->cam.eye.x += 24000.0f DIV_FRAME_FACTOR;
+            player->cam.at.x += 24000.0f DIV_FRAME_FACTOR;
+        }
+
+        if (player->pos.z > 12000.0f) {
+            var_v0 = true;
+            player->pos.z -= 24000.0f DIV_FRAME_FACTOR;
+            player->cam.eye.z -= 24000.0f DIV_FRAME_FACTOR;
+            player->cam.at.z -= 24000.0f DIV_FRAME_FACTOR;
+        }
+        if (player->pos.z < -12000.0f) {
+            var_v0 = true;
+            player->pos.z += 24000.0f DIV_FRAME_FACTOR;
+            player->cam.eye.z += 24000.0f DIV_FRAME_FACTOR;
+            player->cam.at.z += 24000.0f DIV_FRAME_FACTOR;
+        }
+        if (var_v0) {
+            gVsLockOnTimers[player->num][0] = gVsLockOnTimers[player->num][1] = gVsLockOnTimers[player->num][2] =
+                gVsLockOnTimers[player->num][3] = 0;
+        }
+    } else {
+        var_fv1 = 12500.0f;
+        if (gCurrentLevel == LEVEL_CORNERIA) {
+            var_fv1 = 8000.0f;
+        } else if (gCurrentLevel == LEVEL_BOLSE) {
+            var_fv1 = 10000.0f;
+        } else if (gCurrentLevel == LEVEL_SECTOR_Z) {
+            var_fv1 = 20000.0f;
+        } else if ((gCurrentLevel == LEVEL_VENOM_ANDROSS) && (gDrawBackdrop >= 4)) {
+            var_fv1 = 100000.0f;
+        }
+        if ((var_fv1 < fabsf(player->pos.x)) || (var_fv1 < fabsf(player->pos.z))) {
+            player->state_1C8 = PLAYERSTATE_1C8_U_TURN;
+            player->unk_19C = 0;
+            player->csState = 0;
+            player->unk_000 = 0.0f;
+            player->unk_004 = 0.0f;
+        }
+    }
+}
+#else
+void Player_CheckBounds360(Player* player) {
+    f32 var_fv1;
+    bool var_v0 = false;
+    
     if (gCamCount != 1) {
         if (player->pos.x > 12000.0f) {
             var_v0 = true;
@@ -3880,6 +4078,7 @@ void Player_CheckBounds360(Player* player) {
         }
     }
 }
+#endif
 
 #if ENABLE_60FPS == 1 // Player_MoveArwing360
 void Player_MoveArwing360(Player* player) {
@@ -3896,11 +4095,12 @@ void Player_MoveArwing360(Player* player) {
     Vec3f sp4C;
     Vec3f sp40;
 
-    gPlayerTurnRate = (2.3f);
-    gPlayerTurnStickMod = (0.68f);
+    gPlayerTurnRate = 2.3f;
+    gPlayerTurnStickMod = 0.68f;
     sp7C = -gInputPress->stick_x;
     sp78 = gInputPress->stick_y;
-    Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, ((0.1f DIV_FRAME_FACTOR)), ((5.0f DIV_FRAME_FACTOR)),((0.01f DIV_FRAME_FACTOR))); // 60fps
+    Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.01f DIV_FRAME_FACTOR);
+
     Matrix_RotateZ(gCalcMatrix, -player->zRotBank * M_DTOR, MTXF_NEW);
     sp4C.x = sp7C * 0.75f;
     sp4C.y = sp78 * 0.75f;
@@ -4348,11 +4548,11 @@ void Player_MoveArwingOnRails(Player* player) { // 60fps Arwing Move on Rails
 
     if ((player->zRotBank > 10.0f) && (stickX > 0)) {
         sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
+        gPlayerTurnRate *= 2.0f; // handled in the next function
     }
     if ((player->zRotBank < (-10.0f)) && (stickX < 0)) {
         sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
+        gPlayerTurnRate *= 2.0f; // handled in the next function
     }
     if (player->rollState != 0) {
         sp84 = 0.2f;
@@ -4368,7 +4568,7 @@ void Player_MoveArwingOnRails(Player* player) { // 60fps Arwing Move on Rails
     if ((var_fa1 <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
         var_fa1 = 0.0f;
         sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
+        gPlayerTurnRate *= 2.0f; // handled in the next function
     }
 
     Math_SmoothStepToF(&player->rot.x, var_fa1, sp84 DIV_FRAME_FACTOR, gPlayerTurnRate DIV_FRAME_FACTOR, 0.03f DIV_FRAME_FACTOR); // 60fps
@@ -4398,8 +4598,8 @@ void Player_MoveArwingOnRails(Player* player) { // 60fps Arwing Move on Rails
 
     Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp68, &sp44);
 
-    sp44.x *= 1.4f;
-    sp44.y *= 1.4f;
+    sp44.x *= (1.4f); // Dont handle
+    sp44.y *= (1.4f); // Dont handle
 
     Matrix_RotateY(gCalcMatrix, player->yRot_114 * M_DTOR, MTXF_NEW);
     Matrix_RotateX(gCalcMatrix, player->xRot_120 * M_DTOR, MTXF_APPLY);
@@ -4416,7 +4616,7 @@ void Player_MoveArwingOnRails(Player* player) { // 60fps Arwing Move on Rails
     player->vel.z = sp5C.z + sp50.z;
 
     if (gCurrentLevel == LEVEL_VENOM_ANDROSS) {
-        player->vel.z += D_Andross_801A7F58;
+        player->vel.z += D_Andross_801A7F58 DIV_FRAME_FACTOR; //??????
     }
     sp68.x = 0.0f;
     sp68.y = 0.0f;
@@ -5704,7 +5904,7 @@ void Player_ArwingBoost(Player* player) {
                 }
             }
             if (gLevelType == LEVELTYPE_PLANET) {
-                player->wings.unk_28 += ((35.0f - player->wings.unk_28) * 0.1f) DIV_FRAME_FACTOR;
+                player->wings.unk_28 += ((35.0f - player->wings.unk_28) * 0.1f) DIV_FRAME_FACTOR; // Already handeled? 
                 Math_SmoothStepToF(&player->wings.unk_04, 0.0f, 0.5f DIV_FRAME_FACTOR, 100.0f DIV_FRAME_FACTOR, 0.0f);
                 Math_SmoothStepToF(&player->wings.unk_08, 0.0f, 0.5f DIV_FRAME_FACTOR, 100.0f DIV_FRAME_FACTOR, 0.0f);
                 Math_SmoothStepToF(&player->wings.unk_0C, 0.0f, 0.5f DIV_FRAME_FACTOR, 100.0f DIV_FRAME_FACTOR, 0.0f);
@@ -5715,7 +5915,7 @@ void Player_ArwingBoost(Player* player) {
                 player->boostMeter = 90.0f;
                 player->boostCooldown = true;
             }
-            player->contrailScale += 0.04f;
+            player->contrailScale += 0.04f; // Not needed ??? why? 
             if (player->contrailScale > 0.6f) {
                 player->contrailScale = 0.6f;
             }
@@ -6221,26 +6421,26 @@ void Player_UpdateEffects(Player* player) {
         }
     }
     if (gLeftWingFlashTimer[player->num] != 0) {
-        gLeftWingFlashTimer[player->num]--;
+        gLeftWingFlashTimer[player->num]--; //???????
         if (gLeftWingFlashTimer[player->num] == 1000) {
             gLeftWingFlashTimer[player->num] = 0;
         }
     }
     if (gLeftWingDebrisTimer[player->num] != 0) {
-        gLeftWingDebrisTimer[player->num]--;
+        gLeftWingDebrisTimer[player->num]--; //???????
     }
     if (gRightWingDebrisTimer[player->num] != 0) {
-        gRightWingDebrisTimer[player->num]--;
+        gRightWingDebrisTimer[player->num]--; //???????
     }
     if (gShieldTimer[player->num] != 0) {
-        gShieldTimer[player->num]--;
+        gShieldTimer[player->num]--; //???????
         Math_SmoothStepToF(&gShieldAlpha[player->num], 128.0f, (1.0f DIV_FRAME_FACTOR), (40.0f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
     } else {
         Math_SmoothStepToF(&gShieldAlpha[player->num], 0.0f, (1.0f DIV_FRAME_FACTOR), (10.0f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
     }
     Math_SmoothStepToF(&gMuzzleFlashScale[player->num], 0.0f, (1.0f DIV_FRAME_FACTOR), (0.4f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
     if ((player->form == FORM_LANDMASTER) && (player->unk_1A0 != 0)) {
-        player->unk_1A0--;
+        player->unk_1A0--; //???????
     }
     player->dmgEffect = player->dmgEffectTimer & 1;
     if (player->dmgEffectTimer != 0) {
@@ -6285,20 +6485,20 @@ void Player_UpdateEffects(Player* player) {
             player->boostCooldown = true;
             player->rot.x = 0;
             player->rot.y = 0;
-            Math_SmoothStepToF(&player->boostSpeed, 0, (1.0f), (5.0f), 0); // 60fps??????
+            Math_SmoothStepToF(&player->boostSpeed, 0, 1.0f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0);
         }
         if (player->hitTimer == 0) {
             player->damageShake = 0;
         }
     }
-    player->pos.x += player->knockback.x ;
-    player->pos.y += player->knockback.y ;
+    player->pos.x += player->knockback.x DIV_FRAME_FACTOR;
+    player->pos.y += player->knockback.y DIV_FRAME_FACTOR;
     if (gLevelMode == LEVELMODE_ALL_RANGE) {
-        player->pos.z += player->knockback.z;
-        Math_SmoothStepToF(&player->knockback.z, 0, (0.1f ), 1.0f , 0.5f ); // 60fps
+        player->pos.z += player->knockback.z DIV_FRAME_FACTOR;
+        Math_SmoothStepToF(&player->knockback.z, 0, 0.1f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.5f DIV_FRAME_FACTOR); // 60fps
     }
-    Math_SmoothStepToF(&player->knockback.x, 0, (0.1f ), (1.0f ), (0.5f )); // 60fps
-    Math_SmoothStepToF(&player->knockback.y, 0, (0.1f ), (1.0f ), (0.5f )); // 60fps
+    Math_SmoothStepToF(&player->knockback.x, 0, 0.1f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.5f DIV_FRAME_FACTOR); // 60fps
+    Math_SmoothStepToF(&player->knockback.y, 0, 0.1f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.5f DIV_FRAME_FACTOR); // 60fps
     player->contrailScale -= 0.02f ; // 60fps??????
     if (player->contrailScale < 0.0f) {
         player->contrailScale = 0.0f;
@@ -6529,6 +6729,67 @@ void Player_Down(Player* player) {
     gShowHud = 0;
 }
 
+#if ENABLE_60FPS == 1 // Player_UpdateOnRails
+void Player_UpdateOnRails(Player* player) {
+    switch (player->form) {
+        case FORM_ARWING:
+            if (player->csTimer != 0) {
+                gInputPress->stick_x = 0;
+                gInputPress->stick_y = 0;
+                gInputPress->button = 0;
+                gInputHold->button = gBoostButton[player->num];
+                player->boostMeter = 1.0f;
+            }
+            Player_ArwingBank(player);
+            Player_ArwingBoost(player);
+            Player_ArwingBrake(player);
+            Play_dummy_800B41E0(player);
+            Player_UpdateArwingRoll(player);
+            if (player->somersault) {
+                Player_PerformLoop(player);
+            } else {
+                Player_MoveArwingOnRails(player);
+            }
+            Player_UpdatePath(player); // theboy181 update on rails function calls
+            Player_Shoot(player);
+            Player_CollisionCheck(player);
+            Player_DamageEffects(player);
+            Player_WaterEffects(player);
+            Player_FloorCheck(player);
+            Player_LowHealthAlarm(player);
+            if ((player->shields <= 0) && (player->radioDamageTimer != 0)) {
+                Player_Down(player);
+                player->vel.x *= PROPER_DIV_FRAME_FACTOR(0.2f);  // 8/14/2024
+                player->vel.y = 5.0f;
+                player->rot.x = player->rot.y = 0.0f;
+                player->alternateView = false;
+                player->csTimer = 20;
+                if (gLevelType == LEVELTYPE_SPACE) {
+                    player->csTimer = 40;
+                }
+                player->csEventTimer = 120;
+            }
+            break;
+        case FORM_LANDMASTER:
+            Tank_UpdateOnRails(player);
+            break;
+        case FORM_BLUE_MARINE:
+            Aquas_BlueMarineBoost(player);
+            Aquas_BlueMarineBrake(player);
+            Play_dummy_800B41E0(player);
+            Aquas_BlueMarineMove(player);
+            Player_UpdatePath(player);
+            Aquas_BlueMarineShoot(player);
+            Player_CollisionCheck(player);
+            Player_FloorCheck(player);
+            Player_LowHealthAlarm(player);
+            if ((player->shields <= 0) && (player->radioDamageTimer != 0)) {
+                Player_Down(player);
+            }
+            break;
+    }
+}
+#else
 void Player_UpdateOnRails(Player* player) {
     switch (player->form) {
         case FORM_ARWING:
@@ -6588,6 +6849,7 @@ void Player_UpdateOnRails(Player* player) {
             break;
     }
 }
+#endif
 
 void Player_Update360(Player* player) {
     switch (player->form) {
@@ -7372,13 +7634,13 @@ void Camera_UpdateArwingOnRails(Player* player) {
     if (player->somersault) {
         gCsCamEyeZ += 200.0f;
         gCsCamAtY = (player->pos.y - player->yPath) * 0.9f;
-        Math_SmoothStepToF(&player->cam.eye.z, gCsCamEyeZ, (0.1f), (8.0f), (0.0f)); // 60fps camera adjusted rails petrie????? why?
-        Math_SmoothStepToF(&player->unk_018, (0.2f), (1.0f), (0.05f), (0.0f)); // 60fps camera adjusted rails petrie????? why?
+        Math_SmoothStepToF(&player->cam.eye.z, gCsCamEyeZ, 0.1f DIV_FRAME_FACTOR, 8.0f DIV_FRAME_FACTOR, 0.0f); // 8/11/2024
+        Math_SmoothStepToF(&player->unk_018, 0.2f, 1.0f DIV_FRAME_FACTOR, 0.05f DIV_FRAME_FACTOR, 0.0f); // 8/11/2024
     } else {
         Math_SmoothStepToF(&player->cam.eye.z, gCsCamEyeZ, (0.2f DIV_FRAME_FACTOR), (20.0f DIV_FRAME_FACTOR), (0.0f)); // 60fps camera adjusted rails
         Math_SmoothStepToF(&player->unk_018, (1.0f), (1.0f DIV_FRAME_FACTOR), (0.05f DIV_FRAME_FACTOR), (0.0f)); // 60fps camera adjusted rails
     }
-    gCsCamAtY += player->yPath + (sOverheadCamDist * 0.5f);
+    gCsCamAtY += player->yPath + (sOverheadCamDist * 0.5f); // ??????
     Math_SmoothStepToF(&player->cam.eye.x, gCsCamEyeX, player->unk_014 DIV_FRAME_FACTOR, 1000.0f DIV_FRAME_FACTOR, 0.0f); // 60fps?????? petrie says its close enough.
     Math_SmoothStepToF(&player->cam.eye.y, gCsCamEyeY, player->unk_018 DIV_FRAME_FACTOR, 1000.0f DIV_FRAME_FACTOR, 0.0f);
     Math_SmoothStepToF(&player->cam.at.x, gCsCamAtX, player->unk_014 DIV_FRAME_FACTOR, 1000.0f DIV_FRAME_FACTOR, 0.0f);

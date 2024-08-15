@@ -1171,7 +1171,7 @@ void Katina_BossSpawnEnemies(Saucerer* this, Vec3f* pos, f32 arg2) {
     s32 i;
     ActorAllRange* actor = &gActors[20];
 
-    for (i = 10; i < 49; i++, actor++) {
+    for (i = 10; i < 49; i++, actor++) { // Spawn enimies 
         if (actor->obj.status == OBJ_FREE) {
             Actor_Initialize(actor);
             actor->obj.status = OBJ_ACTIVE;
@@ -1235,8 +1235,6 @@ void Katina_SetOutcomingEnemyAngle(Saucerer* this) {
     }
 }
 
-s32 actorcounter = 0;
-
 #if ENABLE_60FPS == 1 // Katina_BossUpdate
 void Katina_BossUpdate(Saucerer* this) {
     s32 i;
@@ -1249,12 +1247,6 @@ void Katina_BossUpdate(Saucerer* this) {
     Vec3f dest;
     s32 pad3;
     Actor* actor;
-
-    for (i = 0, actorcounter = 0; i < ARRAY_COUNT(gActors); i++) {
-        if (gActors[i].obj.status==OBJ_ACTIVE){
-        actorcounter++;
-        }
-    }
 
     gBossFrameCount++;
 
@@ -1969,12 +1961,6 @@ void Katina_BossUpdate(Saucerer* this) {
     s32 pad3;
     Actor* actor;
 
-    for (i = 0, actorcounter = 0; i < ARRAY_COUNT(gActors); i++) {
-        if (gActors[i].obj.status==OBJ_ACTIVE){
-        actorcounter++;
-        }
-    }
-    
     gBossFrameCount++;
 
     enemyCount = 0;
@@ -3809,6 +3795,7 @@ void Katina_BillFighterInit(void) {
 }
 
 void Katina_UpdateEvents(ActorAllRange* this) {
+
     s32 pad[4];
     f32 D_i4_8019F494[5] = { -200.0f, -100.0f, -0.0f, 100.0f, 200.0f };
 
@@ -3900,7 +3887,6 @@ void Katina_UpdateEvents(ActorAllRange* this) {
         }
     }
 }
-
 void Katina_Init(void) {
     Frontlinebase* base = &gBosses[KA_BOSS_BASE];
     Saucerer* saucerer = &gBosses[KA_BOSS_SAUCERER];

@@ -1830,6 +1830,28 @@ void func_effect_8007BC7C(f32 xPos, f32 yPos, f32 zPos, f32 scale2) {
     }
 }
 
+#if ENABLE_60FPS == 1 // func_effect_8007BCE8
+void func_effect_8007BCE8(Effect* effect) {
+    msgPrint = "8007BCE8";
+    if (gPlayer[0].state_1C8 == PLAYERSTATE_1C8_LEVEL_COMPLETE) {
+        effect->obj.rot.x = RAD_TO_DEG(gPlayer[0].camPitch);
+        effect->obj.rot.y = RAD_TO_DEG(-gPlayer[0].camYaw);
+    }
+    if (gPlayer[0].state_1C8 == PLAYERSTATE_1C8_NEXT) {
+        effect->unk_46 = 2;
+        effect->vel.y -= 0.13f DIV_FRAME_FACTOR;
+    }
+
+    effect->scale2 += 0.07f DIV_FRAME_FACTOR;
+    effect->unk_4A -= effect->unk_46 DIV_FRAME_FACTOR;
+
+    if (effect->unk_4A < 0) {
+        Object_Kill(&effect->obj, effect->sfxSource);
+    }
+    effect->obj.rot.z += effect->unk_48 DIV_FRAME_FACTOR;
+    effect->vel.y += 0.2f DIV_FRAME_FACTOR;
+}
+#else
 void func_effect_8007BCE8(Effect* effect) {
     if (gPlayer[0].state_1C8 == PLAYERSTATE_1C8_LEVEL_COMPLETE) {
         effect->obj.rot.x = RAD_TO_DEG(gPlayer[0].camPitch);
@@ -1849,6 +1871,7 @@ void func_effect_8007BCE8(Effect* effect) {
     effect->obj.rot.z += effect->unk_48;
     effect->vel.y += 0.2f;
 }
+#endif
 
 #if ENABLE_60FPS == 1 // func_effect_8007BDE0 *fortuna
 void func_effect_8007BDE0(Effect* effect) {

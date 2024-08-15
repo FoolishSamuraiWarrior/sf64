@@ -261,7 +261,7 @@ Spawner_Playground(void) {
 }
 
 void Spawner(void) {
-    static bool sFreeze = true;
+    //static bool sFreeze = false; // start not frozen
     static s32 sHoldTimer = 0;
     ObjCount counter;
 
@@ -273,111 +273,111 @@ void Spawner(void) {
     Spawner_Playground();
 
     /* Object Selector */
-    sContPress = &gControllerPress[gMainController];
-    sContHold = &gControllerHold[gMainController];
+   //sContPress = &gControllerPress[gMainController];
+   //sContHold = &gControllerHold[gMainController];
 
-    if (sContHold->button & (L_JPAD | R_JPAD)) {
-        sHoldTimer++;
-    } else {
-        sHoldTimer = 0;
-    }
+   //if (sContHold->button & (L_JPAD | R_JPAD)) {
+   //    sHoldTimer++;
+   //} else {
+   //    sHoldTimer = 0;
+   //}
 
-    if (((sContHold->button & L_JPAD) && (sHoldTimer > 15)) || (sContPress->button & L_JPAD)) {
-        sObjId--;
-    } else if (((sContHold->button & R_JPAD) && (sHoldTimer > 15)) || (sContPress->button & R_JPAD)) {
-        sObjId++;
-    } else if (gControllerPress[0].button & D_JPAD) {
-        sFreeze ^= 1; // Freeze arwing.
-    } else if (gControllerPress[0].button & U_JPAD) {
-        Spawner_ObjKill();
-    } else if (gControllerPress[0].button & R_CBUTTONS) {
-        sObjType++;
-        switch (sObjType) {
-            case OBJ_SPAWN_EVENT:
-                sObjId = EVID_0;
-                break;
-            case OBJ_SPAWN_SCENERY:
-                sObjId = 0;
-                break;
-            case OBJ_SPAWN_SPRITE:
-                sObjId = OBJ_SPRITE_CO_POLE;
-                break;
-            case OBJ_SPAWN_ACTOR:
-                sObjId = OBJ_ACTOR_CO_GARUDA_1;
-                break;
-            case OBJ_SPAWN_BOSS:
-                sObjId = 292;
-                break;
-            case OBJ_SPAWN_ITEM:
-                sObjId = OBJ_ITEM_LASERS;
-                break;
-            case OBJ_SPAWN_EFFECT:
-                sObjId = OBJ_EFFECT_FIRE_SMOKE;
-                break;
-            default:
-                sObjId = 0;
-                break;
-        }
-    }
+   //if (((sContHold->button & L_JPAD) && (sHoldTimer > 15)) || (sContPress->button & L_JPAD)) {
+   //    sObjId--;
+   //} else if (((sContHold->button & R_JPAD) && (sHoldTimer > 15)) || (sContPress->button & R_JPAD)) {
+   //    sObjId++;
+   //} else if (gControllerPress[0].button & D_JPAD) {
+   //    sFreeze ^= 1; // Freeze arwing.
+   //} else if (gControllerPress[0].button & U_JPAD) {
+   //    Spawner_ObjKill();
+   //} else if (gControllerPress[0].button & R_CBUTTONS) {
+   //    sObjType++;
+   //    switch (sObjType) {
+   //        case OBJ_SPAWN_EVENT:
+   //            sObjId = EVID_0;
+   //            break;
+   //        case OBJ_SPAWN_SCENERY:
+   //            sObjId = 0;
+   //            break;
+   //        case OBJ_SPAWN_SPRITE:
+   //            sObjId = OBJ_SPRITE_CO_POLE;
+   //            break;
+   //        case OBJ_SPAWN_ACTOR:
+   //            sObjId = OBJ_ACTOR_CO_GARUDA_1;
+   //            break;
+   //        case OBJ_SPAWN_BOSS:
+   //            sObjId = 292;
+   //            break;
+   //        case OBJ_SPAWN_ITEM:
+   //            sObjId = OBJ_ITEM_LASERS;
+   //            break;
+   //        case OBJ_SPAWN_EFFECT:
+   //            sObjId = OBJ_EFFECT_FIRE_SMOKE;
+   //            break;
+   //        default:
+   //            sObjId = 0;
+   //            break;
+   //    }
+   //}
 
-    if (sObjId < 0) {
-        sObjId = 0;
-    }
+   //if (sObjId < 0) {
+   //    sObjId = 0;
+   //}
 
-    if (sObjType >= OBJ_SPAWN_MAX) {
-        sObjType = OBJ_SPAWN_SCENERY;
-    }
+   //if (sObjType >= OBJ_SPAWN_MAX) {
+   //    sObjType = OBJ_SPAWN_SCENERY;
+   //}
 
     /* Freeze arwing */
-    if (sFreeze) {
-        gPlayer[0].baseSpeed = 0;
-    } else {
-        gPlayer[0].baseSpeed = gArwingSpeed;
-    }
+    //if (sFreeze) {
+    //    gPlayer[0].baseSpeed = 0;
+    //} else {
+    //    gPlayer[0].baseSpeed = gArwingSpeed;
+    //}
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83);
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
 
     /* Spawners */
-    switch (sObjType) {
-        case OBJ_SPAWN_SCENERY:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "SCENERY:");
-            Graphics_DisplaySmallNumber(80, 220, sObjId);
-            Spawner_Scenery(sObjId);
-            break;
-        case OBJ_SPAWN_SPRITE:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "SPRITE:");
-            Graphics_DisplaySmallNumber(65, 220, sObjId);
-            Spawner_Sprite(sObjId);
-            break;
-        case OBJ_SPAWN_ACTOR:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "ACTOR:");
-            Graphics_DisplaySmallNumber(60, 220, sObjId);
-            Spawner_Actor(sObjId);
-            break;
-        case OBJ_SPAWN_BOSS:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "BOSS:");
-            Graphics_DisplaySmallNumber(55, 220, sObjId);
-            Spawner_Boss(sObjId);
-            break;
-        case OBJ_SPAWN_ITEM:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "ITEM:");
-            Graphics_DisplaySmallNumber(50, 220, sObjId);
-            Spawner_Item(sObjId);
-            break;
-        case OBJ_SPAWN_EFFECT:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "EFFECT:");
-            Graphics_DisplaySmallNumber(65, 220, sObjId);
-            Spawner_Effect(sObjId);
-            break;
-        case OBJ_SPAWN_EVENT:
-            Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "EVENT:");
-            Graphics_DisplaySmallNumber(60, 220, sObjId);
-            Spawner_Event(sObjId);
-            break;
-        default:
-            break;
-    }
+    //switch (sObjType) {
+    //    case OBJ_SPAWN_SCENERY:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "SCENERY:");
+    //        Graphics_DisplaySmallNumber(80, 220, sObjId);
+    //        Spawner_Scenery(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_SPRITE:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "SPRITE:");
+    //        Graphics_DisplaySmallNumber(65, 220, sObjId);
+    //        Spawner_Sprite(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_ACTOR:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "ACTOR:");
+    //        Graphics_DisplaySmallNumber(60, 220, sObjId);
+    //        Spawner_Actor(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_BOSS:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "BOSS:");
+    //        Graphics_DisplaySmallNumber(55, 220, sObjId);
+    //        Spawner_Boss(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_ITEM:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "ITEM:");
+    //        Graphics_DisplaySmallNumber(50, 220, sObjId);
+    //        Spawner_Item(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_EFFECT:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "EFFECT:");
+    //        Graphics_DisplaySmallNumber(65, 220, sObjId);
+    //        Spawner_Effect(sObjId);
+    //        break;
+    //    case OBJ_SPAWN_EVENT:
+    //        Graphics_DisplaySmallText(10, 220, 1.0f, 1.0f, "EVENT:");
+    //        Graphics_DisplaySmallNumber(60, 220, sObjId);
+    //        Spawner_Event(sObjId);
+    //        break;
+    //    default:
+    //        break;
+    //}
 
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
 
