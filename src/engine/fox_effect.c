@@ -1832,7 +1832,6 @@ void func_effect_8007BC7C(f32 xPos, f32 yPos, f32 zPos, f32 scale2) {
 
 #if ENABLE_60FPS == 1 // func_effect_8007BCE8
 void func_effect_8007BCE8(Effect* effect) {
-    msgPrint = "8007BCE8";
     if (gPlayer[0].state_1C8 == PLAYERSTATE_1C8_LEVEL_COMPLETE) {
         effect->obj.rot.x = RAD_TO_DEG(gPlayer[0].camPitch);
         effect->obj.rot.y = RAD_TO_DEG(-gPlayer[0].camYaw);

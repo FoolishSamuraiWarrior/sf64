@@ -3371,7 +3371,7 @@ bool Player_CanLockOn(s32 playerNum) {
     return true;
 }
 
-#if ENABLE_60FPS == 1 // Player_UpdateLockOn
+#if ENABLE_60FPS == 1 // Player_UpdateLockOn * no change yet
 bool Player_UpdateLockOn(Player* player) {
     bool hasBombTarget;
     s32 i;
@@ -5606,7 +5606,7 @@ void Player_UpdateArwingRoll(Player* player) {
     s32 temp_v0_7;
     s32 var_v0;
 
-    Math_SmoothStepToF(&player->unk_150, 1.0f, (0.05f DIV_FRAME_FACTOR), (10.0f DIV_FRAME_FACTOR), (0.0001f DIV_FRAME_FACTOR)); // 60fps
+    Math_SmoothStepToF(&player->unk_150, 1.0f, 0.05f DIV_FRAME_FACTOR, 10.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR); // 60fps
     player->zRotBarrelRoll = Math_ModF(player->zRotBarrelRoll, 360.0f);
     if (player->barrelRollAlpha > 0) {
         player->barrelRollAlpha -= 30 DIV_FRAME_FACTOR; // 60fps
@@ -6415,7 +6415,7 @@ void Player_UpdateEffects(Player* player) {
         }
     }
     if (gRightWingFlashTimer[player->num] != 0) {
-        gRightWingFlashTimer[player->num]--;
+        gRightWingFlashTimer[player->num]--; //???????
         if (gRightWingFlashTimer[player->num] == 1000) {
             gRightWingFlashTimer[player->num] = 0;
         }
@@ -6434,11 +6434,11 @@ void Player_UpdateEffects(Player* player) {
     }
     if (gShieldTimer[player->num] != 0) {
         gShieldTimer[player->num]--; //???????
-        Math_SmoothStepToF(&gShieldAlpha[player->num], 128.0f, (1.0f DIV_FRAME_FACTOR), (40.0f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
+        Math_SmoothStepToF(&gShieldAlpha[player->num], 128.0f, 1.0f DIV_FRAME_FACTOR, 40.0f DIV_FRAME_FACTOR, 0.01f DIV_FRAME_FACTOR); // 60fps??????
     } else {
-        Math_SmoothStepToF(&gShieldAlpha[player->num], 0.0f, (1.0f DIV_FRAME_FACTOR), (10.0f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
+        Math_SmoothStepToF(&gShieldAlpha[player->num], 0.0f, 1.0f DIV_FRAME_FACTOR, 10.0f DIV_FRAME_FACTOR, 0.01f DIV_FRAME_FACTOR); // 60fps??????
     }
-    Math_SmoothStepToF(&gMuzzleFlashScale[player->num], 0.0f, (1.0f DIV_FRAME_FACTOR), (0.4f DIV_FRAME_FACTOR), 0.01f DIV_FRAME_FACTOR); // 60fps??????
+    Math_SmoothStepToF(&gMuzzleFlashScale[player->num], 0.0f, 1.0f DIV_FRAME_FACTOR, 0.4f DIV_FRAME_FACTOR, 0.01f DIV_FRAME_FACTOR); // 60fps??????
     if ((player->form == FORM_LANDMASTER) && (player->unk_1A0 != 0)) {
         player->unk_1A0--; //???????
     }
