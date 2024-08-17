@@ -82,7 +82,7 @@ s32 gGameFrameCount; //NONGLOBAL
 int gGameFrameCountHack;
 #endif
 
-#if DISP_MESSAGE2 == 1
+#if DISP_MESSAGE2 == 1 || DISP_MESSAGE == 1
 char* msgPrint;
 #endif
 

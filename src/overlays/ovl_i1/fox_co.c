@@ -4962,7 +4962,7 @@ void Corneria_LevelStart(Player* player) {
     }
 if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
     for (i = 0; (i < 40 && D_ctx_80177A48[6] >= 0.2f );
-         i++, D_ctx_80177A48[6] -= 0.2f DIV_FRAME_FACTOR) {
+         i++, D_ctx_80177A48[6] -= 0.2f) {
         if (sp44 >= 0) {
             Texture_Scroll(D_arwing_30184D8, 64, 32, 2);
         } else {
@@ -4971,7 +4971,7 @@ if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
     }
 
     for (i = 0; (i < 40 && D_ctx_80177A48[7] >= 0.3f );
-         i++, D_ctx_80177A48[7] -= 0.3f DIV_FRAME_FACTOR) {
+         i++, D_ctx_80177A48[7] -= 0.3f ) {
         if (sp40 >= 0) {
             Texture_Scroll(D_arwing_30184D8, 64, 32, 0);
         } else {
@@ -5115,7 +5115,7 @@ if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
                 actor2->state = 0;
                 actor1->state = 0;
                 actor0->obj.pos.y = player->pos.y + 80.0f;
-                actor0->obj.pos.z += 100.0f DIV_FRAME_FACTOR;
+                actor0->obj.pos.z += 100.0f ;  // Do not adjust, and camera will zoom in properly
             }
 
             if (gMsgCharIsPrinting && (gGameFrameCount & (2 MUL_FRAME_FACTOR))) {
@@ -5124,7 +5124,7 @@ if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
             break;
 
         case 3:
-            if (fabsf(Math_SmoothStepToF(&actor0->obj.pos.z, player->pos.z + 100.0f, 0.05f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.0f)) < 1.0f DIV_FRAME_FACTOR) {
+            if (fabsf(Math_SmoothStepToF(&actor0->obj.pos.z, player->pos.z + 100.0f, 0.05f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.0f)) < (1.0f DIV_FRAME_FACTOR)) {
                 player->csState = 4;
                 D_ctx_80177A48[0] = 0.0f;
                 player->csTimer = 190 ;
