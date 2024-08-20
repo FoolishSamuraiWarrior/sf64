@@ -5115,7 +5115,7 @@ if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
                 actor2->state = 0;
                 actor1->state = 0;
                 actor0->obj.pos.y = player->pos.y + 80.0f;
-                actor0->obj.pos.z += 100.0f ;  // Do not adjust, and camera will zoom in properly
+                actor0->obj.pos.z += 100.0f ;  // Do not adjust, and camera will zoom in properly *timer == 0 only excuted once
             }
 
             if (gMsgCharIsPrinting && (gGameFrameCount & (2 MUL_FRAME_FACTOR))) {
@@ -6049,10 +6049,10 @@ void Corneria_LevelComplete1(Player* player) {
 
             if (gCsFrameCount < 30 MUL_FRAME_FACTOR) {
                 temp_deg = Math_RadToDeg(-Math_Atan2F(temp_fa0, temp_fa1));
-                var_fv1 = Math_SmoothStepToAngle(&player->rot.y, temp_deg, 0.5f DIV_FRAME_FACTOR, 4.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 20.0f DIV_FRAME_FACTOR; //60fps??????
+                var_fv1 = (Math_SmoothStepToAngle(&player->rot.y, temp_deg, 0.5f DIV_FRAME_FACTOR, 4.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 20.0f) MUL_FRAME_FACTOR; 
             } else {
                 temp_deg = Math_RadToDeg(Math_Atan2F(temp_fa0, temp_fa1));
-                var_fv1 = Math_SmoothStepToAngle(&player->rot.y, temp_deg, 0.5f DIV_FRAME_FACTOR, 2.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f DIV_FRAME_FACTOR;
+                var_fv1 = (Math_SmoothStepToAngle(&player->rot.y, temp_deg, 0.5f DIV_FRAME_FACTOR, 2.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f) MUL_FRAME_FACTOR ;
             }
 
             Math_SmoothStepToAngle(&player->rot.z, var_fv1, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR);

@@ -19,12 +19,12 @@ extern s32 actorcounter;
 
 // gBosses[0].state // Show Boss Case
 // gActors[0].iwork[0]
-
+// gPlayer[0].rot.x
 
 #define name2 gBosses[0].state // Show Boss Case
+#define name5 gBosses[1].state // Show Boss Case
 #define name3 gBosses[2].state // Show Boss Case
 #define name4 gPlayer[0].csState
-#define name5 0
 #define name6 0
 #define name7 0
 #define name8 0

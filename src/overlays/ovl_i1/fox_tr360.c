@@ -130,7 +130,7 @@ void Training_80199024(Actor* actor) {
     }
 
     Math_SmoothStepToAngle(&actor->rot_0F4.x, var_fv0, 0.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR);
-    temp_fv1 = Math_SmoothStepToAngle(&actor->rot_0F4.y, actor->fwork[19], 0.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f; //?????
+    temp_fv1 = (Math_SmoothStepToAngle(&actor->rot_0F4.y, actor->fwork[19], 0.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f) MUL_FRAME_FACTOR; //?????
 
     if (temp_fv1 < 0.0f) {
         var_fv0_2 = temp_fv1 * -1.0f;

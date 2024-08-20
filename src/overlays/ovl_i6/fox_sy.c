@@ -942,9 +942,10 @@ void SectorY_80199438(Boss* boss) {
                 gControllerRumbleFlags[gMainController] = 1;
                 gControllerRumbleTimers[gMainController] = 20;
                 D_ctx_80177850 = 15;
+                if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
                 boss->swork[36]++;
-                func_effect_8007BFFC(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, boss->vel.x, boss->vel.y,
-                                     boss->vel.z, 8.0f, 10);
+                }
+                func_effect_8007BFFC(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, boss->vel.x, boss->vel.y, boss->vel.z, 8.0f, 10);
                 func_effect_8007B344(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, 8.0f, 5);
                 for (i = 10; i < 24; i++) {
                     if (i != 15) {
@@ -963,8 +964,7 @@ void SectorY_80199438(Boss* boss) {
         }
 
         if (((gGameFrameCount % (4 MUL_FRAME_FACTOR)) == 0) && (boss->swork[36] == 0)) {
-            func_effect_8007C120(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, boss->vel.x, boss->vel.y,
-                                 boss->vel.z, 0.1f, 5);
+            func_effect_8007C120(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, boss->vel.x, boss->vel.y, boss->vel.z, 0.1f, 5);
         }
 
         if ((gCsFrameCount == (120 MUL_FRAME_FACTOR)) && (boss->swork[36] == 0) && (boss->index == 0)) {
@@ -984,7 +984,9 @@ void SectorY_80199438(Boss* boss) {
             func_effect_8007D0E0(boss->obj.pos.x, boss->obj.pos.y, boss->obj.pos.z, 30.0f);
             func_enmy_80062B60(boss->obj.pos.x, boss->obj.pos.z, 0, 120.0f);
             gCameraShake = 25;
+            if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
             boss->swork[36]++;
+            }
 
             for (i = 10; i < 24; i++) {
                 if (i != 15) {
@@ -1653,9 +1655,10 @@ void SectorY_8019AAF0(Boss* boss) {
         var_fv1 += 200.0f DIV_FRAME_FACTOR;
     }
 
-    if ((boss->swork[31] >= boss->unk_04C) && (fabsf(boss->obj.pos.z - boss->fwork[20]) < (var_fv1 + 1000.0f)) &&
-        (fabsf(boss->obj.pos.x - boss->fwork[18]) < var_fv1)) {
+    if ((boss->swork[31] >= boss->unk_04C) && (fabsf(boss->obj.pos.z - boss->fwork[20]) < (var_fv1 + 1000.0f)) && (fabsf(boss->obj.pos.x - boss->fwork[18]) < var_fv1)) {
+        if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
         boss->unk_04C++;
+        }
     }
 
     if (boss->unk_04C >= boss->swork[32] - 29) {
@@ -1805,7 +1808,9 @@ void SectorY_8019AEEC(Boss* boss) {
         if (boss->unk_04A != 0) {
             if (boss->unk_04A == 1) {
                 Audio_PlaySequence(SEQ_PLAYER_BGM, NA_BGM_REAL_BOSS, 0, 0);
-                boss->unk_04A++;
+                if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
+                boss->unk_04A++; // ???????
+                }
                 gPlayer[0].cam.eye.x = 0.0f;
                 gPlayer[0].cam.eye.y = 200.0f;
                 gPlayer[0].cam.eye.z = -20000.0f;
@@ -1891,7 +1896,7 @@ void SectorY_8019AEEC(Boss* boss) {
             gPlayer[0].state_1C8 = PLAYERSTATE_1C8_ACTIVE;
             Camera_UpdateArwing360(&gPlayer[0], 1);
             gPlayer[0].unk_014 = 0.0f;
-            boss->swork[34]++;
+            boss->swork[34]++; // Dont adjust - Impacts the health meter of the boss, and death animation
             Radio_PlayMessage(gMsg_ID_14310, RCID_BOSS_SECTORY);
             gBossFrameCount = 0;
         }
@@ -2037,6 +2042,70 @@ bool SectorY_8019B5CC(Boss* boss) {
     return false;
 }
 
+#if ENABLE_60FPS == 1 //
+void SectorY_8019B6E8(Boss* boss) {
+    f32 var4;
+    f32 var3;
+    f32 var2;
+    f32 var;
+
+    var = ABS(ABS(gPlayer[0].pos.x - boss->obj.pos.x) + ABS(gPlayer[0].pos.y - boss->obj.pos.y) +
+              ABS(gPlayer[0].pos.z - 1000.0f - boss->obj.pos.z));
+
+    var2 = ABS(gActors[2].obj.pos.x - boss->obj.pos.x) + ABS(gActors[2].obj.pos.y - boss->obj.pos.y) +
+           ABS(gActors[2].obj.pos.z - boss->obj.pos.z);
+
+    var3 = ABS(gActors[3].obj.pos.x - boss->obj.pos.x) + ABS(gActors[3].obj.pos.y - boss->obj.pos.y) +
+           ABS(gActors[3].obj.pos.z - boss->obj.pos.z);
+
+    var4 = ABS(gActors[4].obj.pos.x - boss->obj.pos.x) + ABS(gActors[4].obj.pos.y - boss->obj.pos.y) +
+           ABS(gActors[4].obj.pos.z - boss->obj.pos.z);
+
+    boss->swork[22] = 1;
+    boss->fwork[18] = gPlayer[0].pos.x;
+    boss->fwork[19] = gPlayer[0].pos.y;
+    boss->fwork[20] = gPlayer[0].pos.z;
+    boss->fwork[24] = gPlayer[0].vel.x;
+    boss->fwork[25] = gPlayer[0].vel.y;
+    boss->fwork[26] = gPlayer[0].vel.z;
+
+    if (var2 < var) {
+        var = var2;
+        if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
+        boss->swork[22]++;
+        }
+        //msgPrint = "SWORK22";
+
+        boss->fwork[18] = gActors[2].obj.pos.x;
+        boss->fwork[19] = gActors[2].obj.pos.y;
+        boss->fwork[20] = gActors[2].obj.pos.z;
+        boss->fwork[24] = gActors[2].vel.x;
+        boss->fwork[25] = gActors[2].vel.y;
+        boss->fwork[26] = gActors[2].vel.z;
+    }
+
+    if (var3 < var) {
+        boss->swork[22] = 3;
+        boss->fwork[18] = gActors[3].obj.pos.x;
+        boss->fwork[19] = gActors[3].obj.pos.y;
+        boss->fwork[20] = gActors[3].obj.pos.z;
+        boss->fwork[24] = gActors[3].vel.x;
+        boss->fwork[25] = gActors[3].vel.y;
+        boss->fwork[26] = gActors[3].vel.z;
+        var = var3;
+    }
+
+    if (var4 < var) {
+        boss->fwork[18] = gActors[4].obj.pos.x;
+        boss->fwork[19] = gActors[4].obj.pos.y;
+        boss->fwork[20] = gActors[4].obj.pos.z;
+        boss->fwork[24] = gActors[4].vel.x;
+        boss->fwork[25] = gActors[4].vel.y;
+        boss->fwork[26] = gActors[4].vel.z;
+        boss->swork[22] = 4;
+    }
+}
+#else
 void SectorY_8019B6E8(Boss* boss) {
     f32 var4;
     f32 var3;
@@ -2095,6 +2164,7 @@ void SectorY_8019B6E8(Boss* boss) {
         boss->swork[22] = 4;
     }
 }
+#endif
 
 void SectorY_8019BBBC(Boss* boss) {
     boss->fwork[18] = gPlayer[0].pos.x;
@@ -2408,9 +2478,10 @@ void SectorY_Boss_Update(Boss* boss) {
                 gScenery360[0].obj.pos.z += 20.0f DIV_FRAME_FACTOR;
             }
             if (gScenery360[0].obj.pos.z == 0.0f) {
-                if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
-                boss->swork[34]++; //????
-                }
+            if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
+            boss->swork[34]++;
+            }
+            //msgPrint = "SWORK34 2";
             }
         }
         if (boss->index == 2) {
@@ -2468,7 +2539,9 @@ void SectorY_Boss_Update(Boss* boss) {
                 break;
 
             case 4:
-                boss->unk_04C++;
+                        if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
+        boss->unk_04C++;
+        }
                 if (boss->unk_04C >= Animation_GetFrameCount(&D_SY_6003348)) {
                     boss->unk_04C = Animation_GetFrameCount(&D_SY_6003348) - 1;
                 }
@@ -2476,7 +2549,9 @@ void SectorY_Boss_Update(Boss* boss) {
                 break;
 
             case 5:
-                boss->unk_04C++;
+                        if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
+        boss->unk_04C++;
+        }
                 if (boss->unk_04C >= Animation_GetFrameCount(&D_SY_602738C)) {
                     boss->unk_04C = 0;
                 }
@@ -2489,20 +2564,26 @@ void SectorY_Boss_Update(Boss* boss) {
 
             case 7:
                 if (boss->unk_04C < (Animation_GetFrameCount(&D_SY_602645C) - 1)) {
-                    boss->unk_04C++;
+                            if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
+        boss->unk_04C++;
+        }
                 }
                 sp1D0 = Animation_GetFrameData(&D_SY_602645C, boss->unk_04C, sp64);
                 break;
 
             case 8:
                 if (boss->unk_04C < (Animation_GetFrameCount(&D_SY_60258A0) - 1)) {
-                    boss->unk_04C++;
+                            if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
+        boss->unk_04C++;
+        }
                 }
                 sp1D0 = Animation_GetFrameData(&D_SY_60258A0, boss->unk_04C, sp64);
                 break;
 
             case 9:
-                boss->unk_04C++;
+                        if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK // 8/19/2024
+        boss->unk_04C++;
+        }
                 if (boss->unk_04C >= Animation_GetFrameCount(&D_SY_60034C4)) {
                     boss->unk_04C = 0;
                 }
@@ -2683,7 +2764,10 @@ void SectorY_Boss_Update(Boss* boss) {
         }
 
         if (D_edisplay_801615D0.z > 0.0f) {
+            if (((gGameFrameCountHack % FRAME_FACTOR) == 0)) { // 60fps HACK
             boss->swork[30]++;
+            }
+           //msgPrint = "SWORK30 1";
             if (boss->swork[30] > 300 && ((ABS(D_edisplay_801615D0.z) + ABS(D_edisplay_801615D0.x)) < 3500.0f) &&
                 (gRadioState == 0)) {
                 if (gTeamShields[TEAM_ID_PEPPY] > 0) {
@@ -3423,12 +3507,12 @@ void SectorY_LevelComplete(Player* player) {
             break;
 
         case 1:
-            Math_SmoothStepToF(&player->rot.x, 0, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0 DIV_FRAME_FACTOR);
+            Math_SmoothStepToF(&player->rot.x, 0, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0);
             Math_SmoothStepToF(&player->pos.y, 400.0f, 0.05f DIV_FRAME_FACTOR, 3.0f DIV_FRAME_FACTOR, 0);
             temp1 = player->pos.x - boss->obj.pos.x;
             temp2 = player->pos.z - boss->obj.pos.z;
             temp_ft1 = Math_RadToDeg(Math_Atan2F(temp1, temp2));
-            temp_ft1 = Math_SmoothStepToAngle(&player->rot.y, temp_ft1, 0.5f DIV_FRAME_FACTOR, 2.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f;
+            temp_ft1 = (Math_SmoothStepToAngle(&player->rot.y, temp_ft1, 0.5f DIV_FRAME_FACTOR, 2.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f) MUL_FRAME_FACTOR;
             Math_SmoothStepToAngle(&player->rot.z, -temp_ft1, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR);
 
             if (gCsFrameCount < 180 MUL_FRAME_FACTOR) {
@@ -3497,7 +3581,7 @@ void SectorY_LevelComplete(Player* player) {
 
         case 3:
             if ((gCsFrameCount < 720 MUL_FRAME_FACTOR) && gMsgCharIsPrinting) {
-                player->wings.unk_30 = (f32) (gGameFrameCount & (2 MUL_FRAME_FACTOR)) * (5.0f DIV_FRAME_FACTOR);
+                player->wings.unk_30 = (f32) ((gGameFrameCount DIV_FRAME_FACTOR) & (2 MUL_FRAME_FACTOR)) * 5.0f ;
             }
 
             gFillScreenAlphaTarget = 0;
@@ -4428,12 +4512,12 @@ void SectorY_801A0AC0(Player* player) {
             gActors[6].fwork[1] = 15.0f;
             /* fallthrough */
         case 1:
-            if (gCsFrameCount < (3 MUL_FRAME_FACTOR) ) {
+            if ((gCsFrameCount DIV_FRAME_FACTOR) < 3 ) {
                 gFillScreenAlpha = 255;
             }
             
-            if ((gGameFrameCount & (12 MUL_FRAME_FACTOR)) && ((gGameFrameCount % (4 MUL_FRAME_FACTOR)) == 0)) { // Shots from open enimies cutscene
-                spB0 = (((gGameFrameCount & (12 MUL_FRAME_FACTOR)) >> 3) + 4);   // >> 2 = >> 3 to fix shots adjsut Bitmask
+            if (((gCsFrameCount) & (12 MUL_FRAME_FACTOR)) && (((gCsFrameCount) % (4 MUL_FRAME_FACTOR)) == 0)) { // Shots from open enimies cutscene
+                spB0 = ((((gCsFrameCount) & (12 MUL_FRAME_FACTOR)) >> 3) + 4);   // >> 2 = >> 3 to fix shots adjsut Bitmask
                 for (i = 10; i < ARRAY_COUNT(gActors); i++) {
                     if (gActors[i].obj.status == OBJ_FREE) {
                         SectorY_801A07FC(&gActors[spB0], &gActors[i]);
@@ -4442,8 +4526,8 @@ void SectorY_801A0AC0(Player* player) {
                 }
             }
 
-            if (((gGameFrameCount % (4 MUL_FRAME_FACTOR)) == 0)) { // Carrier shoots at enimes
-                spB0 = ((s32) (gGameFrameCount % (16 MUL_FRAME_FACTOR)) >> 3) + 4; // >> 2 = >> 3 to fix shots adjsut Bitmask
+            if ((((gCsFrameCount) % (4 MUL_FRAME_FACTOR)) == 0)) { // Carrier shoots at enimes
+                spB0 = ((s32) ((gCsFrameCount) % (16 MUL_FRAME_FACTOR)) >> 3) + 4; // >> 2 = >> 3 to fix shots adjsut Bitmask
                 if (spB0 == 4) {
                     if (gCsFrameCount < 140 MUL_FRAME_FACTOR) {
                         spB0 = 11;
@@ -4483,10 +4567,10 @@ void SectorY_801A0AC0(Player* player) {
             }
             
             if (gCsFrameCount >= (189 MUL_FRAME_FACTOR)) { // enimies fly towrard ship continued
-                gActors[6].vel.z = SIN_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 378) * gActors[6].fwork[1];
-                gActors[6].vel.y = COS_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 378) * gActors[6].fwork[1];
-                gActors[7].vel.z = SIN_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 378) * -gActors[6].fwork[1];
-                gActors[7].vel.y = COS_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 378) * -gActors[6].fwork[1];
+                gActors[6].vel.z = SIN_DEG(((gCsFrameCount DIV_FRAME_FACTOR)* 2) - 378) * gActors[6].fwork[1];
+                gActors[6].vel.y = COS_DEG(((gCsFrameCount DIV_FRAME_FACTOR)* 2) - 378) * gActors[6].fwork[1];
+                gActors[7].vel.z = SIN_DEG(((gCsFrameCount DIV_FRAME_FACTOR)* 2) - 378) * -gActors[6].fwork[1];
+                gActors[7].vel.y = COS_DEG(((gCsFrameCount DIV_FRAME_FACTOR)* 2) - 378) * -gActors[6].fwork[1];
                 Math_SmoothStepToF(&gActors[6].fwork[1], 30.0f, 1.0f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 0.0f);
                 Math_SmoothStepToAngle(&gActors[6].obj.rot.z, 180.0f, 1.0f DIV_FRAME_FACTOR, 0.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR);
                 Math_SmoothStepToAngle(&gActors[7].obj.rot.z, 181.0f, 1.0f DIV_FRAME_FACTOR, 0.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR);
@@ -4543,9 +4627,9 @@ void SectorY_801A0AC0(Player* player) {
                     if (gActors[i].obj.status == OBJ_FREE) {
                         SectorY_801A0A08(
                             &gActors[i], gActors[8].obj.pos.x + 1000.0f,
-                            (gActors[8].obj.pos.y + 2000.0f + ((s32) ((gGameFrameCount % (4U MUL_FRAME_FACTOR)) - 2) * 2000.0f)) +
+                            (gActors[8].obj.pos.y + 2000.0f + ((s32) (((gGameFrameCount DIV_FRAME_FACTOR) % (4U MUL_FRAME_FACTOR)) - 2) * 2000.0f)) +
                                 RAND_FLOAT_CENTERED(4000.0f),
-                            (gActors[8].obj.pos.z + 4000.0f + ((s32) ((gGameFrameCount % (4U MUL_FRAME_FACTOR)) - 2) * 3000.0f)) +
+                            (gActors[8].obj.pos.z + 4000.0f + ((s32) (((gGameFrameCount DIV_FRAME_FACTOR) % (4U MUL_FRAME_FACTOR)) - 2) * 3000.0f)) +
                                 RAND_FLOAT_CENTERED(7000.0f),
                             RAND_FLOAT(10.0f));
                         break;
@@ -4716,10 +4800,10 @@ void SectorY_801A0AC0(Player* player) {
                 gActors[9].iwork[3] -= 5 DIV_FRAME_FACTOR; // not even
             }
             if (gCsFrameCount >= (280 MUL_FRAME_FACTOR)) {
-                gActors[6].vel.z = COS_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 540) * gActors[6].fwork[1];
-                gActors[6].vel.y = SIN_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 540) * -gActors[6].fwork[1];
-                gActors[7].vel.z = COS_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 540) * -gActors[6].fwork[1];
-                gActors[7].vel.y = SIN_DEG((gCsFrameCount DIV_FRAME_FACTOR * 2) - 540) * gActors[6].fwork[1];
+                gActors[6].vel.z = COS_DEG(((gCsFrameCount DIV_FRAME_FACTOR) * 2) - 540) * gActors[6].fwork[1];
+                gActors[6].vel.y = SIN_DEG(((gCsFrameCount DIV_FRAME_FACTOR) * 2) - 540) * -gActors[6].fwork[1];
+                gActors[7].vel.z = COS_DEG(((gCsFrameCount DIV_FRAME_FACTOR) * 2) - 540) * -gActors[6].fwork[1];
+                gActors[7].vel.y = SIN_DEG(((gCsFrameCount DIV_FRAME_FACTOR) * 2) - 540) * gActors[6].fwork[1];
                 Math_SmoothStepToF(&gActors[6].fwork[1], 0.0f, 1.0f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR);
                 Math_SmoothStepToAngle(&gActors[6].obj.rot.z, 0.0f, 1.0f DIV_FRAME_FACTOR, 4.0f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR);
                 Math_SmoothStepToAngle(&gActors[7].obj.rot.z, 0.0f, 1.0f DIV_FRAME_FACTOR, 1.5f DIV_FRAME_FACTOR, 1.0f DIV_FRAME_FACTOR);
@@ -4912,7 +4996,7 @@ void SectorY_801A0AC0(Player* player) {
 
             if ((gCsFrameCount > (440 MUL_FRAME_FACTOR)) && (player->rot.y != 0.0f)) {
                 Math_SmoothStepToF(&gPlayer[0].pos.y, 0.0f, 0.1f DIV_FRAME_FACTOR, 5.0f DIV_FRAME_FACTOR, 0.0f);
-                Math_SmoothStepToAngle(&player->rot.z,Math_SmoothStepToAngle(&player->rot.y, 0.0f, 1.0f DIV_FRAME_FACTOR, 0.7f DIV_FRAME_FACTOR, 0.0f) * 30.0f MUL_FRAME_FACTOR, 0.1f DIV_FRAME_FACTOR,5.0f DIV_FRAME_FACTOR, 0); //?????
+                Math_SmoothStepToAngle(&player->rot.z,(Math_SmoothStepToAngle(&player->rot.y, 0.0f, 1.0f DIV_FRAME_FACTOR, 0.7f DIV_FRAME_FACTOR, 0.0f) * 30.0f) MUL_FRAME_FACTOR, 0.1f DIV_FRAME_FACTOR,5.0f DIV_FRAME_FACTOR, 0); // NEEDS testings
                 Math_SmoothStepToF(&gPlayer[0].pos.x, 0.0f, 1.0f DIV_FRAME_FACTOR, 13.0f DIV_FRAME_FACTOR, 0.0f);
             }
 

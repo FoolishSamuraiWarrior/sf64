@@ -2813,9 +2813,9 @@ void Actor_SetupPlayerShot(PlayerShotId objId, PlayerShot* shot, s32 actorId, f3
     shot->unk_60 = 0;
 
     if (objId == PLAYERSHOT_GFOX_LASER) {
-        shot->timer = 120 MUL_FRAME_FACTOR;
+        shot->timer = 120;
     } else {
-        shot->timer = 30 MUL_FRAME_FACTOR;
+        shot->timer = 30;
     }
     shot->sourceId = actorId + NPC_SHOT_ID;
 

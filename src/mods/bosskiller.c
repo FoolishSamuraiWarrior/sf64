@@ -54,6 +54,9 @@ if (gControllerPress[0].button & D_JPAD) {
         bossMercyTimer = 0;
 
     if ((gControllerHold[0].button & killButton) && (gControllerHold[0].button & killButton1)) {
+        if(bossMercyTimer != 0){
+            return;
+        }
         switch (gCurrentLevel) {
             case LEVEL_CORNERIA:
                 if (boss[0].obj.status != OBJ_ACTIVE)
@@ -83,6 +86,7 @@ if (gControllerPress[0].button & D_JPAD) {
                     boss[3].state = 1;
                     gShowBossHealth = false;
                 }
+                bossMercyTimer = 100;
                 break;
 
             case LEVEL_METEO:
@@ -93,6 +97,7 @@ if (gControllerPress[0].button & D_JPAD) {
                 boss[0].swork[8] = 0;
                 boss[0].health = 0;
                 boss[0].state = 9;
+                bossMercyTimer = 100;
                 break;
 
             case LEVEL_SECTOR_X:

@@ -686,7 +686,7 @@ void func_edisplay_8005B848(Actor* actor) {
             break;
     }
     scale = 2.0f;
-    if ((gGameFrameCount % 2) != 0) {
+    if ((gGameFrameCount % (2 MUL_FRAME_FACTOR)) != 0) {
         scale = 1.7f;
     }
     Matrix_Translate(gGfxMatrix, 0.0f, 0.0f, -60.0f, MTXF_APPLY);

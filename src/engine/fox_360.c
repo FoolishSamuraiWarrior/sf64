@@ -2134,7 +2134,7 @@ void ActorAllRange_Update(Actor* this) {
             }
         }
         Math_SmoothStepToAngle(&this->rot_0F4.x, spD8, 0.5f DIV_FRAME_FACTOR, this->fwork[2] DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR);
-        spD0 = Math_SmoothStepToAngle(&this->rot_0F4.y, spD4, 0.5f DIV_FRAME_FACTOR, this->fwork[2] DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f;
+        spD0 = (Math_SmoothStepToAngle(&this->rot_0F4.y, spD4, 0.5f DIV_FRAME_FACTOR, this->fwork[2] DIV_FRAME_FACTOR, 0.0001f DIV_FRAME_FACTOR) * 30.0f) MUL_FRAME_FACTOR;
         if (spD0 < 0.0f) {
             spD0 = spD0 * -1.0f;
         } else {

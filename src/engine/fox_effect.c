@@ -441,12 +441,12 @@ void func_effect_800780F8(Effect* effect) {
     s32 i;
 
     if (effect->unk_4A > 10) {
-        if (((effect->index + gGameFrameCount) % (2 MUL_FRAME_FACTOR)) == 0) {
+        if (((effect->index + (gGameFrameCount DIV_FRAME_FACTOR)) % (2 MUL_FRAME_FACTOR)) == 0) {
             gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 128, 128, 32);
         } else {
             gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 128, 128, 128);
         }
-    } else if (((effect->index + gGameFrameCount) % (2 MUL_FRAME_FACTOR)) == 0) {
+    } else if (((effect->index + (gGameFrameCount DIV_FRAME_FACTOR)) % (2 MUL_FRAME_FACTOR)) == 0) {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
     } else {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 96, 96, 255, 255);
@@ -1187,7 +1187,7 @@ void func_effect_8007A568(f32 xPos, f32 yPos, f32 zPos, f32 scale1) {
 void func_effect_8007A5F8(Effect* effect, Vec3f* pos, u32 sfxId) {
     Effect_Initialize(effect);
     effect->obj.status = OBJ_ACTIVE;
-    effect->obj.id = OBJ_EFFECT_373;
+    effect->obj.id = OBJ_EFFECT_373; // handled
 
     effect->obj.pos.x = pos->x;
     effect->obj.pos.y = pos->y;
@@ -1915,7 +1915,7 @@ void func_effect_8007BF64(Effect* effect, f32 xPos, f32 yPos, f32 zPos, f32 xVel
                           s32 timer50) {
     Effect_Initialize(effect);
     effect->obj.status = OBJ_INIT;
-    effect->obj.id = OBJ_EFFECT_386;
+    effect->obj.id = OBJ_EFFECT_386; // handeld
 
     effect->obj.pos.x = xPos;
     effect->obj.pos.y = yPos;
@@ -1960,7 +1960,6 @@ void func_effect_8007C088(Effect* effect, f32 xPos, f32 yPos, f32 zPos, f32 xVel
 
 void func_effect_8007C120(f32 xPos, f32 yPos, f32 zPos, f32 xVel, f32 yVel, f32 zVel, f32 scale2, s32 timer50) {
     s32 i;
-
     for (i = ARRAY_COUNT(gEffects) - 1; i >= 0; i--) {
         if (gEffects[i].obj.status == OBJ_FREE) {
             func_effect_8007C088(&gEffects[i], xPos, yPos, zPos, xVel, yVel, zVel, scale2, timer50);
@@ -2079,8 +2078,7 @@ void func_effect_8007C50C(Effect* effect) {
         randX = RAND_FLOAT_CENTERED(40.0f) * effect->scale2;
         randY = RAND_FLOAT_CENTERED(40.0f) * effect->scale2;
         randOther = RAND_FLOAT(1.0f) + 1.0f;
-        func_effect_8007C484(effect->obj.pos.x + randX, effect->obj.pos.y + randY, effect->obj.pos.z, effect->vel.x,
-                             effect->vel.y, effect->vel.z, effect->scale2 * randOther, 0);
+        func_effect_8007C484(effect->obj.pos.x + randX, effect->obj.pos.y + randY, effect->obj.pos.z, effect->vel.x, effect->vel.y, effect->vel.z, effect->scale2 * randOther, 0);
         if (effect->timer_50 == 0) {
             Object_Kill(&effect->obj, effect->sfxSource);
         }

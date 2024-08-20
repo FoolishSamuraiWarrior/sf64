@@ -9,9 +9,9 @@
 #define MODS_SFX_JUKEBOX                0
 #define MODS_AUTO_DEBUGGER              0
 #define MODS_FPS_COUNTER                0
+#define MODS_SPAWNER                    0
 #define DISP_MESSAGE                    0
 #define DISP_MESSAGE2                   0
-#define MODS_SPAWNER                    0
 #define ENABLE_FREEZE                   0
 #define BOSS_KILLER                     0
 #define MODS_LEVEL_SELECT               0
@@ -30,7 +30,7 @@
  * state. Two presets (map and main menu) are provided.
  * For the full list of game states, see sf64thread.h.
  */
-//#define MODS_BOOT_STATE 3  // main menu
+// #define MODS_BOOT_STATE 3  // main menu
 // #define MODS_BOOT_STATE 4  // map
 // #define MODS_BOOT_STATE GSTATE_PLAY  // DEMO 
 

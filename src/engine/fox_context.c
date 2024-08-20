@@ -177,7 +177,7 @@ f32 gCsTeamTargetsX[3]; // x positions of certain actors (teammates?)
 f32 gCsTeamTargetsY[3]; // y positions of certain actors (teammates?)
 f32 gCsTeamTargetsZ[3]; // z positions of certain actors (teammates?)
 f32 gCameraShakeY;
-s32 gCameraShake;
+s32 gCameraShake; // Global
 s32 D_ctx_80178484; // set to 100000 when pausing but not used
 bool gLoadLevelObjects;
 UNK_TYPE F_8017848C;
